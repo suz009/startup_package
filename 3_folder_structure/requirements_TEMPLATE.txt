@@ -1,0 +1,14 @@
+# ============================================================
+# requirements.txt — Python dependency manifest
+# Pin versions when you care about reproducibility.
+# ============================================================
+
+# Core data
+# pandas==2.2.0
+# numpy==1.26.0
+# pyyaml==6.0.1
+
+# HTTP / API clients
+# requests==2.31.0
+
+# (Add per-project dependencies below)

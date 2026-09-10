@@ -1,0 +1,104 @@
+# ============================================================
+# .gitignore — startup-package template
+# Adapt the per-stage data-file blocks to the new repo's stages.
+# ============================================================
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# ---- Virtual environment ----
+.venv/
+venv/
+env/
+
+# ---- Editor settings ----
+.vscode/
+.idea/
+*.swp
+*~
+
+# ---- Credentials / config / secrets ----
+.env
+.env.*
+!.env.example
+*credentials*
+*api_keys*
+*.key
+*.pem
+pybliometrics.cfg
+*.cfg
+*.ini
+
+# ---- OS junk ----
+.DS_Store
+Thumbs.db
+
+# ---- Claude Code settings (entire dir, machine-local) ----
+.claude/
+
+# ---- Background materials (large, mostly PDFs) ----
+0_context/background/*.pdf
+0_context/background/*.epub
+
+# ============================================================
+# DATA FILES — large outputs at each pipeline stage
+# Track only metadata + reports; ignore bulk binary/csv/json.
+# Adapt the stage subdirectory names below for your repo.
+# ============================================================
+
+# ---- Stage 0: Current working data (regenerable) ----
+1_data/0_current/*.json
+1_data/0_current/*.csv
+1_data/0_current/*.parquet
+
+# ---- Stage 1: Database API retrieval (raw data, regenerable) ----
+1_data/1_*/**/*.csv
+1_data/1_*/**/*.parquet
+1_data/1_*/**/*.feather
+1_data/1_*/**/*.pkl
+1_data/1_*/**/*.pickle
+1_data/1_*/**/*.gz
+1_data/1_*/**/*.zip
+# JSON/JSONL retrieval outputs may be tracked via Git LFS — see .gitattributes
+# Uncomment the next two lines to ignore them in plain git:
+# 1_data/1_*/**/*.json
+# 1_data/1_*/**/*.jsonl
+
+# ---- Stages 2+: cleaned / merged / dedup / network outputs ----
+1_data/2_*/**/*.json
+1_data/2_*/**/*.csv
+1_data/2_*/**/*.parquet
+1_data/3_*/**/*.json
+1_data/3_*/**/*.csv
+1_data/3_*/**/*.parquet
+1_data/4_*/**/*.json
+1_data/4_*/**/*.csv
+1_data/4_*/**/*.xlsx
+1_data/5_*/**/*.json
+1_data/5_*/**/*.csv
+# Add 1_data/6_*, 1_data/7_*, etc. as your pipeline grows.
+
+# ---- Archive (large data files, keep but don't pollute git) ----
+1_data/99_archive/**/*.json
+1_data/99_archive/**/*.csv
+1_data/99_archive/**/*.parquet
+
+# ---- EXCEPTIONS: track important metadata + reports ----
+!1_data/**/metadata.json
+!1_data/**/*_metadata.json
+!1_data/**/*.md
+!1_data/**/*.txt
+
+# ============================================================
+# IDE and scratch files (untracked)
+# ============================================================
+background_materials/*.md
+background_materials/*.pdf

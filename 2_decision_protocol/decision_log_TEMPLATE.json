@@ -1,0 +1,11 @@
+{
+  "metadata": {
+    "project": "<<PROJECT_NAME>>",
+    "protocol_baseline_version": "1.0",
+    "protocol_current_version": "1.0",
+    "created": "<<YYYY-MM-DDTHH:MM:SSZ>>",
+    "last_updated": "<<YYYY-MM-DDTHH:MM:SSZ>>",
+    "total_decisions": 0
+  },
+  "decisions": []
+}

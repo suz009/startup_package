@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Validate JSON for any staged .claude/*.json file.
+# Why: settings.local.json was force-tracked previously and got malformed
+# during merges (see SESSION_SUMMARY_2026-04-23.md). This hook prevents
+# committing invalid JSON in .claude/.
+set -e
+
+staged_json=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^\.claude/.*\.json$' || true)
+[ -z "$staged_json" ] && exit 0
+
+failed=0
+for f in $staged_json; do
+  if ! python3 -m json.tool "$f" > /dev/null 2>&1; then
+    echo "ERROR: $f is not valid JSON. Pre-commit blocked." >&2
+    python3 -m json.tool "$f" || true
+    failed=1
+  fi
+done
+
+[ "$failed" -eq 0 ] || exit 1
+exit 0

@@ -1,0 +1,12 @@
+{
+  "metadata": {
+    "project": "[PROJECT_NAME]",
+    "protocol": "BACKLOG_PROTOCOL.md v1.0",
+    "created": "[YYYY-MM-DD]",
+    "last_updated": "[YYYY-MM-DD]",
+    "next_id": "TASK-001",
+    "total_tasks": 0,
+    "note": "Canonical cumulative backlog. BACKLOG.md and BACKLOG.html are generated from this file by scripts/render_backlog.py — never edit them by hand. `next_id` and `total_tasks` are RECOMPUTED by the renderer from the tasks array; they are a report, not a source. Take the next id from the highest id present, plus one."
+  },
+  "tasks": []
+}
