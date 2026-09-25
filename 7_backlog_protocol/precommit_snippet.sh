@@ -5,7 +5,7 @@
 #     staged=$(git diff --cached --name-only --diff-filter=ACM)
 # and is tracking failures in `$fail`. Adjust those two names to match.
 #
-# WHY THIS EXISTS. BACKLOG.md and BACKLOG.html are generated from backlog.json
+# WHY THIS EXISTS. BACKLOG.html (and the optional BACKLOG.md) are generated from backlog.json
 # and never edited by hand. A commit that changes the list and leaves the
 # human-readable copies behind is how a backlog stops being believed: the file
 # people actually read says something the canonical file no longer does, and
@@ -17,9 +17,9 @@
 
 if echo "$staged" | grep -q '^0_context/protocol/backlog\.json$'; then
   if python3 scripts/render_backlog.py >/dev/null; then
-    git add 0_context/protocol/backlog.json \
-            0_context/protocol/BACKLOG.md \
-            0_context/protocol/BACKLOG.html
+    git add 0_context/protocol/backlog.json 0_context/protocol/BACKLOG.html
+    # BACKLOG.md is optional (render_backlog.py --md); re-stage it only if the repo keeps one.
+    [ -f 0_context/protocol/BACKLOG.md ] && git add 0_context/protocol/BACKLOG.md
   else
     echo "BLOCKED: could not regenerate the backlog views from backlog.json." >&2
     fail=1

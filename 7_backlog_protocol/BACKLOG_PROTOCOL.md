@@ -38,13 +38,14 @@ The session summary answers "what did we decide that day". The backlog answers
 | File | Role |
 |---|---|
 | `0_context/protocol/backlog.json` | **Canonical.** Machine-readable, append-and-amend. |
-| `0_context/protocol/BACKLOG.md` | **Generated.** Reads in order, grouped by priority. This is what shows up in a diff. Never edit by hand. |
-| `0_context/protocol/BACKLOG.html` | **Generated.** One row per task, sortable, filterable and searchable. Self-contained: opens from disk, no server, no network. Never edit by hand. |
-| `scripts/render_backlog.py` | Regenerates both views from `backlog.json`, and corrects the metadata counters. Standard library only. |
+| `0_context/protocol/BACKLOG.html` | **Generated — the default view.** One row per task, sortable, filterable and searchable. Self-contained: opens from disk in any browser, no server, no network. Never edit by hand. |
+| `0_context/protocol/BACKLOG.md` | *Optional*, generated only with `--md` (or when it already exists). Reads in order, grouped by priority. Never edit by hand. |
+| `scripts/render_backlog.py` | Regenerates the views from `backlog.json`, and corrects the metadata counters. Standard library only. |
 
-The two views answer different questions. **BACKLOG.md** is for reading in order and for
-seeing what changed in a commit. **BACKLOG.html** is for working with a hundred-odd tasks at
-once — sorting by priority, filtering to one area, searching descriptions.
+**BACKLOG.html is how people read the backlog** (default since 2026-09-25): sort by priority,
+filter to one area, search descriptions. An LLM agent reads `backlog.json` directly — the
+HTML embeds the same data but is far larger. BACKLOG.md is off by default; turn it on with
+`python3 scripts/render_backlog.py --md` if a document-style or diff-friendly view is wanted.
 
 Regenerate with:
 
@@ -223,7 +224,8 @@ artefact in your `CLAUDE.md` so the check has an address**, or it will be skippe
   in the session summary.
 
 ### At session start
-- Read `BACKLOG.md` as part of onboarding, alongside the most recent session summaries.
+- Read `backlog.json` as part of onboarding, alongside the most recent session summaries
+  (the user reads the same list in `BACKLOG.html`).
 - **Sweep it** — statuses, contents, and any merges or splits worth proposing.
 - Surface any `mvp`-priority open tasks that bear on the session's objectives.
 - **Check the user-facing documentation** against the project as it currently stands, and

@@ -14,6 +14,12 @@ that is meant to be read as a *list* rather than as a history.
 
 ---
 
+**Default view: `BACKLOG.html`** — a self-contained, searchable, sortable, filterable table that
+opens from disk in any browser (made the default 2026-09-25 at the user's request; `BACKLOG.md`
+is now opt-in via `--md`).
+
+---
+
 ## The problem it solves
 
 Without it, future work lives in the "Next Steps → Future / Not Urgent" section of whichever
@@ -35,7 +41,7 @@ intentions.
 | `README.md` | This file. | Read, then delete after install. |
 | `BACKLOG_PROTOCOL.md` | The protocol document. | Copy into the target repo; replace `[PROJECT_NAME]`; replace the `area` table. |
 | `backlog_TEMPLATE.json` | Empty scaffold for the canonical list. | Copy in, rename to `backlog.json`, fill the metadata. |
-| `render_backlog_TEMPLATE.py` | Generates both human-readable views from the JSON. | Copy in, rename to `render_backlog.py`, replace `[PROJECT_NAME]` and `AREA_LABEL`. |
+| `render_backlog_TEMPLATE.py` | Generates the searchable, sortable `BACKLOG.html` (default) and, with `--md`, an optional `BACKLOG.md`. | Copy in, rename to `render_backlog.py`, replace `[PROJECT_NAME]` and `AREA_LABEL`. |
 | `precommit_snippet.sh` | Hook fragment that regenerates the views on commit. | Paste into the repo's pre-commit hook. |
 | `claude_md_snippet.md` | The wiring text for the LLM's operating instructions. | Paste into the target repo's `CLAUDE.md`. |
 
@@ -138,13 +144,13 @@ writes the correction back, which makes them a *report* rather than a *source*.
 After install, the new repo should:
 
 - Have `0_context/protocol/backlog.json` with `total_tasks: 0` and an empty `tasks: []`.
-- Produce both views from `python3 scripts/render_backlog.py` with no error, and the heading
-  of each should carry the project's name rather than `[PROJECT_NAME]`.
+- Produce `BACKLOG.html` from `python3 scripts/render_backlog.py` with no error, and its heading
+  should carry the project's name rather than `[PROJECT_NAME]`.
 - Open `0_context/protocol/BACKLOG.html` from disk in a browser — no server needed — and show
   an empty, sortable table with priority, status and area filters.
-- Regenerate both views automatically when `backlog.json` is staged for commit.
+- Regenerate the view(s) automatically when `backlog.json` is staged for commit.
 
-Then add one real task by hand and re-run the renderer. It should appear in both views, and
+Then add one real task by hand and re-run the renderer. It should appear in the HTML table, and
 the metadata counters should update themselves. Deliberately set `total_tasks` to a wrong
 number first: the renderer should print `corrected metadata: total_tasks <wrong> → 1` and fix
 the file. That is the check that the third rule above is actually wired in.
