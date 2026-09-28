@@ -17,6 +17,8 @@ shows its users — a help screen, a README, a runbook, a quick-start.
 - **Take the next task id from the highest id present in the array, plus one.** Never from
   `metadata.next_id`: it is maintained by hand, it drifts, and a reused id silently
   reattributes work to a task somebody has already referred to.
+- **Rate each new task's `period_work`** (`yes` / `maybe` / `no`: could Claude do it
+  unsupervised?) when adding it, and re-rate during sweeps when scope changes.
 - Read `0_context/protocol/backlog.json` at session start, sweep it at session start and end,
   and surface any `mvp`-priority open tasks that bear on the day's objectives.
 - **Check [THE PROJECT'S USER-FACING DOCUMENTATION] at the start and end of every session**

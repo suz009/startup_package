@@ -12,10 +12,21 @@ from. There is no single snapshot date for the package as a whole.
 | Features | Contributed by | As of |
 |---|---|---|
 | 1–6 | `2025-12-PhD-Lit-Review-Mode-1` | 2026-04-23 |
-| 7 | `openquali` | 2026-09-10 |
+| 7 | `openquali` | 2026-09-10 (`period_work` field added 2026-09-28) |
+| 8 | drafted by the user, fitted to the package here | 2026-09-28 |
 
 Improvements made later in a contributing repo do not auto-propagate; re-copy the
 subfolder if you want the latest.
+
+---
+
+## Coming from another repo?
+
+If you are an LLM agent working in an **existing** repo and the user has asked you to pull
+one feature in, you do not need the rest of this file. Open that feature's `README.md`:
+it says what to copy and where. Feature 8 has a dedicated **"Retrofit into an existing
+repo"** section written for exactly this case. Adapt paths to what the target repo
+actually has, and never edit this package from another repo's session.
 
 ---
 
@@ -45,7 +56,25 @@ subfolder if you want the latest.
 | 4 | [`4_claude_settings/`](4_claude_settings/) | Claude Code settings architecture: durable patterns in user-global `~/.claude/settings.json`, near-empty per-project `.claude/settings.json`, untracked `.claude/settings.local.json`. Includes the rationale and recommended global-settings file. |
 | 5 | [`5_precommit_json_hook/`](5_precommit_json_hook/) | A `.git/hooks/pre-commit` that blocks invalid JSON in `.claude/`. Belt-and-suspenders companion to feature 4. |
 | 6 | [`6_notifications/`](6_notifications/) | Cross-platform desktop notification hook (Linux `notify-send` / macOS `osascript` / WSL→Windows BurntToast / terminal-bell fallback). Fires on Claude Code permission prompts, elicitation dialogs, idle prompts. |
-| 7 | [`7_backlog_protocol/`](7_backlog_protocol/) | A cumulative, machine-readable backlog that survives the session that raised each task: `TASK-NNN` ids, priority and status vocabularies, a back-reference to the session summary that created it, and a resolution when it closes. Includes a generator producing a readable Markdown view and a sortable, filterable, self-contained HTML view, plus the pre-commit hook that stops those views going stale. |
+| 7 | [`7_backlog_protocol/`](7_backlog_protocol/) | A cumulative, machine-readable backlog that survives the session that raised each task: `TASK-NNN` ids, priority and status vocabularies, a back-reference to the session summary that created it, and a resolution when it closes. Includes a generator producing a readable Markdown view and a sortable, filterable, self-contained HTML view, plus the pre-commit hook that stops those views going stale. Each task carries a `period_work` rating (`yes` / `maybe` / `no`) for Feature 8. |
+| 8 | [`8_period_work_protocol/`](8_period_work_protocol/) | A protocol for leaving Claude working unsupervised for 30 minutes to 12 hours: a seven-step default workflow (below), pre-flight checks while the user is still present, a safety boundary that includes the repo's own guardrails, measured token budgets (`token_usage.py`), and one numbered review packet of questions and decisions at the end. |
+
+---
+
+## Default workflow for period work (Feature 8)
+
+1. **User:** kick-off with goals and either a duration or a request for an estimate.
+2. **Claude:** familiarise, run pre-flight checks (time, permissions, git, external APIs,
+   token estimate), and ask numbered questions. Ask for a duration if none was given.
+   **Does not start work.**
+3. **User:** answer the questions and paste `/usage`. This starts the clock.
+4. **Claude:** works unsupervised for the agreed window, then reports back.
+5. **User:** reviews, answers the collected questions, gives feedback, and allows a few
+   minutes of final fixes.
+6. **User:** instructs Claude to close the session.
+7. **Claude:** final work and session-closing tasks.
+
+Details: [`8_period_work_protocol/PERIOD_WORK_PROTOCOL.md`](8_period_work_protocol/PERIOD_WORK_PROTOCOL.md) §1.
 
 ---
 
@@ -74,8 +103,13 @@ subfolder if you want the latest.
   and the generated view is the one people actually read.
 - **Feature 7 is complementary to Feature 2, not dependent on it.** Tasks cite
   decisions in their `related` array and vice versa; each works alone.
+- **Feature 8 builds on Features 7, 1 and 2, and needs none of them.** It chooses its
+  queue from Feature 7's backlog by `period_work` rating, records one phase entry per
+  period in Feature 1's session summary, and proposes (never finalises) Feature 2
+  decisions. Without them it still works; its protocol says which subsections to delete.
+  It also relies on Feature 4's deny rules as a backstop for its git rules.
 - **Feature 3 is logically independent** but assumes you adopt some directory
-  for `0_context/` (or equivalent) where Features 1, 2, 4–6 and 7 reference paths.
+  for `0_context/` (or equivalent) where Features 1, 2, 4–6, 7 and 8 reference paths.
   If you adopt an unusual top-level layout, the other features' READMEs let
   you point them at any directory.
 

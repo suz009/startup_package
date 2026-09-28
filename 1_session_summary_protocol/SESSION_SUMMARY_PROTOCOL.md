@@ -345,6 +345,15 @@ Document failed attempts thoroughly:
 
 This prevents repeating failed approaches and documents the exploration process.
 
+### Period Work Sessions
+If the repo has the Period Work Protocol (Feature 8) and the session includes a period of
+unsupervised work, the session summary gets **one** phase entry for it, e.g.
+`### Period work (14:05–17:05) (COMPLETED)`, with a short outcome and a link to that
+period's log in `0_context/period_work/`. The per-task detail and the questions for the
+user live in the log, not here, so nothing is written twice. Keep updating this summary
+at checkpoints and before commits as usual. A period that runs past midnight stays in the
+summary for the date the session started.
+
 ### Discovery of Prior Undocumented Work
 If you discover files, commits, or work from prior sessions that wasn't documented:
 - Note the discovery in the current session summary.

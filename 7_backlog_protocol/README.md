@@ -134,6 +134,11 @@ writes the correction back, which makes them a *report* rather than a *source*.
   in their `related` array (`["DEC-009"]`) and vice versa. Both work alone.
 - **Feature 5 (pre-commit hook) is where Step 5 lands.** Standalone-usable — any hook will do —
   but Feature 5's is the natural home.
+- **Feature 8 (period work) reads this backlog.** Its queue is chosen from `backlog.json`
+  using each task's `period_work` rating (`yes` / `maybe` / `no`). The field is optional
+  and harmless without Feature 8, but rating tasks as they are added is what makes the
+  backlog usable for unsupervised periods. Added 2026-09-28; repos installed earlier lack it
+  (Feature 8's README has a retrofit step).
 - **Feature 3 (folder structure)** supplies the `0_context/` directory these paths assume. If
   it is not installed, create just the two directories this feature needs.
 

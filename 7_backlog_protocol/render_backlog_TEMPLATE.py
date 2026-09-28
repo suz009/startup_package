@@ -10,7 +10,7 @@ JSON is staged, so a stale view cannot reach a commit — which is the only sens
 in which "kept in sync" can be made to mean something.
 
 **BACKLOG.html is the default view** (user's instruction, 2026-09-25): one row
-per task, sortable by any column, filterable by priority, status and area, and
+per task, sortable by any column, filterable by priority, status, area and period-work fit, and
 searchable across the title and the description. It carries the whole of
 `backlog.json` inside it, so it is one self-contained file that opens from disk
 with no server and no network. Open it in a browser.
@@ -54,6 +54,14 @@ STATUS_ICON = {
     "done": "✅",
     "dropped": "🚫",
 }
+# `period_work`: whether Claude can do the task unsupervised during a period of
+# work (Feature 8, the Period Work Protocol). Unset means not yet rated.
+PERIOD_WORK_LABEL = {
+    "yes": "yes — clear, verifiable, no user decisions expected",
+    "maybe": "maybe — can progress alone, but likely stops at a judgment call",
+    "no": "no — needs the user, external action, or sensitive judgment",
+}
+
 # Display names for the `area` values. REPLACE THESE with your project's own —
 # they must match the vocabulary in BACKLOG_PROTOCOL.md. An area used in
 # backlog.json but missing here still renders; it just shows its raw value.
@@ -100,7 +108,9 @@ def render(data: dict) -> str:
             area = AREA_LABEL.get(t["area"], t["area"])
             add(f"### {icon} {t['id']} — {t['title']}")
             add("")
-            add(f"*{area} · raised {t['raised']} by {t['raised_by']}*")
+            period = t.get("period_work")
+            period = f" · period work: {period}" if period else ""
+            add(f"*{area} · raised {t['raised']} by {t['raised_by']}{period}*")
             add("")
             # `scale: epic` marks a task too large to pick up as written, which
             # must be broken into phases and subtasks before any of it is built
@@ -176,6 +186,7 @@ HTML_TEMPLATE = """<!doctype html>
  .p-now { color:#fff; background:var(--danger); border-color:var(--danger); }
  .p-post_mvp, .p-someday { color:var(--muted); }
  .p-epic { color:#c9a6ff; border-color:#3d2f55; background:#241a33; }
+ .pw-yes { color:var(--ok); } .pw-maybe { color:var(--warn); } .pw-no, .pw-unrated { color:var(--muted); }
  .s-done { color:var(--ok); } .s-in_progress { color:var(--accent); }
  .s-dropped { color:var(--muted); text-decoration:line-through; }
  tr.done td.title { color:var(--muted); font-weight:400; }
@@ -192,6 +203,9 @@ HTML_TEMPLATE = """<!doctype html>
   <select id="priority"><option value="">Any priority</option>__PRIORITIES__</select>
   <select id="status"><option value="">Any status</option>__STATUSES__</select>
   <select id="area"><option value="">Any area</option>__AREAS__</select>
+  <select id="period" title="Suitable for unsupervised period work?"><option value="">Any period-work fit</option>
+    <option value="yes">Period work: yes</option><option value="maybe">Period work: maybe</option>
+    <option value="no">Period work: no</option><option value="unrated">Period work: unrated</option></select>
   <select id="detail">
     <option value="open">Show why (open tasks)</option>
     <option value="all">Show why (everything)</option>
@@ -205,6 +219,7 @@ HTML_TEMPLATE = """<!doctype html>
     <th data-key="priority">Priority<span class="arrow"></span></th>
     <th data-key="status">Status<span class="arrow"></span></th>
     <th data-key="area">Area<span class="arrow"></span></th>
+    <th data-key="period_work" title="Suitable for unsupervised period work?">Period<span class="arrow"></span></th>
     <th data-key="title">Title<span class="arrow"></span></th>
     <th data-key="raised">Raised<span class="arrow"></span></th>
   </tr></thead>
@@ -216,6 +231,8 @@ HTML_TEMPLATE = """<!doctype html>
 const TASKS = JSON.parse(document.getElementById('data').textContent);
 const PRIORITY_RANK = { now: 0, mvp: 1, post_mvp: 2, someday: 3 };
 const STATUS_RANK = { in_progress: 0, open: 1, done: 2, dropped: 3 };
+const PERIOD_RANK = { yes: 0, maybe: 1, no: 2 };
+const period = (task) => task.period_work || 'unrated';
 let sort = { key: 'priority', dir: 1 };
 
 // Coerced, not assumed: `blocked_by` is a string on some tasks and a list on
@@ -226,6 +243,7 @@ const esc = (s) => (Array.isArray(s) ? s.join(', ') : (s ?? ''))
 function key(task) {
   if (sort.key === 'priority') return [PRIORITY_RANK[task.priority] ?? 9, STATUS_RANK[task.status] ?? 9, task.id];
   if (sort.key === 'status') return [STATUS_RANK[task.status] ?? 9, PRIORITY_RANK[task.priority] ?? 9, task.id];
+  if (sort.key === 'period_work') return [PERIOD_RANK[task.period_work] ?? 3, PRIORITY_RANK[task.priority] ?? 9, task.id];
   return [String(task[sort.key] ?? ''), task.id];
 }
 
@@ -237,6 +255,7 @@ function draw() {
     (!want('priority') || t.priority === want('priority')) &&
     (!want('status') || t.status === want('status')) &&
     (!want('area') || t.area === want('area')) &&
+    (!want('period') || period(t) === want('period')) &&
     (!q || [t.id, t.title, t.description, t.resolution].join(' ').toLowerCase().includes(q))
   ).sort((a, b) => {
     const ka = key(a), kb = key(b);
@@ -258,6 +277,7 @@ function draw() {
       <td><span class="pill p-${t.priority}">${esc(t.priority)}</span>${t.scale === 'epic' ? ' <span class="pill p-epic">epic</span>' : ''}</td>
       <td class="s-${t.status}">${esc(t.status)}</td>
       <td>${esc(t.area)}</td>
+      <td class="pw-${period(t)}">${esc(period(t))}</td>
       <td class="title">${esc(t.title)}${why}</td>
       <td class="id">${esc(t.raised)}</td>
     </tr>`;
@@ -279,7 +299,7 @@ document.querySelectorAll('th').forEach((th) => {
     draw();
   };
 });
-['q', 'priority', 'status', 'area', 'detail'].forEach((id) =>
+['q', 'priority', 'status', 'area', 'period', 'detail'].forEach((id) =>
   document.getElementById(id).addEventListener('input', draw));
 draw();
 </script>

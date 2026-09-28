@@ -69,6 +69,7 @@ python3 scripts/render_backlog.py
   "raised_in": "SESSION_SUMMARY_2026-04-23.md",
   "raised_by": "user",
   "blocked_by": null,
+  "period_work": "yes",
   "related": ["DEC-009"],
   "closed": null,
   "resolution": null
@@ -106,6 +107,24 @@ the project appears.
 | `someday` | Genuinely good idea, no committed timeline. |
 
 **`status`** — `open` | `in_progress` | `done` | `dropped`.
+
+**`blocked_by`** — `null`, the `TASK-NNN` this waits on, or `"user"` when it waits on an
+answer or approval from the user.
+
+**`period_work`** — whether Claude could do the task unsupervised during a period of work
+(Feature 8, the Period Work Protocol). It is a judgment about the task as currently
+written, not about its priority.
+
+| Value | Meaning |
+|---|---|
+| `yes` | Clear requirements, independently verifiable, no user decisions or external actions expected. |
+| `maybe` | Claude can make real progress alone but will probably hit a judgment call (design, method, wording) partway through. |
+| `no` | Needs the user throughout, acts externally, or touches sensitive ground (ethics, real data, security, methodological decisions). |
+| `null` / missing | Not yet rated. |
+
+Rate new tasks when they are added. The sweep rates unrated tasks it touches and re-rates
+any whose scope changed. Splitting a `maybe` task often yields a `yes` part and a `no`
+part: propose that when it would open work to period sessions.
 
 A `dropped` task keeps its record and gains a `resolution` explaining why. Tasks are never
 deleted, for the same reason superseded planning documents are never overwritten: the
@@ -162,6 +181,8 @@ So at session start and session end, review the backlog **as a whole**, not only
 being worked on:
 
 - **Correct statuses.** Anything finished becomes `done` with `closed` and `resolution`.
+- **Correct `period_work` ratings.** Rate unrated tasks, and re-rate any whose scope or
+  blocker changed (see *Field vocabularies*).
 - **Correct contents.** Where some but not all of a task shipped, append a dated note
   saying which part is done and narrowing what remains. A task whose description no longer
   describes the outstanding work is worse than no task.
